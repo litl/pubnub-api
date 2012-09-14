@@ -262,6 +262,7 @@
 		C8FD4D52153D447200D0A418 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Pubnub/Pubnub-Prefix.pch";
 				INFOPLIST_FILE = "Pubnub/Pubnub-Info.plist";
@@ -274,6 +275,7 @@
 		C8FD4D53153D447200D0A418 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Pubnub/Pubnub-Prefix.pch";
 				INFOPLIST_FILE = "Pubnub/Pubnub-Info.plist";

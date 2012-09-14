@@ -5,10 +5,9 @@
 @protocol CEPubnubDelegate <NSObject>
 
 @optional
-
 - (void)pubnub:(CEPubnub *)pubnub
     didSucceedPublishingMessageToChannel:(NSString *)channel
-    withResponce:(id)responce
+    withResponse:(id)response
     message:(id)message;
 
 - (void)pubnub:(CEPubnub *)pubnub
@@ -29,11 +28,19 @@
 
 - (void)pubnub:(CEPubnub *)pubnub didReceiveTime:(NSTimeInterval)time;  // "time" will be NAN on failure
 
-- (void)pubnub:(CEPubnub *)pubnub ConnectToChannel:(NSString *)channel;
-- (void)pubnub:(CEPubnub *)pubnub DisconnectToChannel:(NSString *)channel;
-- (void)pubnub:(CEPubnub *)pubnub Re_ConnectToChannel:(NSString *)channel;
+- (void)pubnub:(CEPubnub *)pubnub connectToChannel:(NSString *)channel;
+- (void)pubnub:(CEPubnub *)pubnub disconnectFromChannel:(NSString *)channel;
+- (void)pubnub:(CEPubnub *)pubnub reconnectToChannel:(NSString *)channel;
 
 - (void)pubnub:(CEPubnub *)pubnub presence:(NSDictionary *)message onChannel:(NSString *)channel;
-- (void)pubnub:(CEPubnub *)pubnub here_now:(NSDictionary *)message onChannel:(NSString *)channel;
+- (void)pubnub:(CEPubnub *)pubnub hereNow:(NSDictionary *)message onChannel:(NSString *)channel;
+
+// **** deprecated methods ****
+
+- (void)pubnub:(CEPubnub *)pubnub didSucceedPublishingMessageToChannel:(NSString *)channel withResponce: (id)responce message:(id)message __deprecated;
+- (void)pubnub:(CEPubnub *)pubnub ConnectToChannel:(NSString *)channel __deprecated;
+- (void)pubnub:(CEPubnub *)pubnub DisconnectToChannel:(NSString *)channel __deprecated;
+- (void)pubnub:(CEPubnub *)pubnub Re_ConnectToChannel:(NSString *)channel __deprecated;
+- (void)pubnub:(CEPubnub *)pubnub here_now:(NSDictionary *)message onChannel:(NSString *)channel __deprecated;
 
 @end

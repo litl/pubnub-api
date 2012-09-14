@@ -383,13 +383,12 @@ typedef enum {
     }
 }
 
-- (void)here_now:(NSString *)channel {
-    if(channel == nil || channel ==@"")
+- (void)hereNow:(NSString *)channel {
+    if(channel == nil || channel == @"")
     {
         NSLog(@"Missing channel");
         return;
     }
-    
     
     NSString *url = [NSString stringWithFormat:@"%@/v2/presence/sub_key/%@/channel/%@", _host, _subscribeKey, [channel urlEscapedString]];
     
@@ -398,6 +397,12 @@ typedef enum {
                                                                     command:kCommand_Here_Now
                                                                     channel:channel];
     [_connections addObject:connection];
+}
+
+// deprecated, but still implement
+// warning is expected
+- (void)here_now:(NSString *)channel {
+    [self hereNow:channel];
 }
 
 - (void)presence:(NSString *)channel
@@ -421,9 +426,7 @@ typedef enum {
                 {
                     it.connected=false;
                     it.first=false;
-                    if ([_delegate respondsToSelector:@selector(pubnub:DisconnectToChannel:)]) {
-                        [_delegate pubnub:self DisconnectToChannel:connection.channel];
-                    }
+                    [self disconnectFromChannel:connection.channel];
                     [_subscriptions removeObject:it];
                     break;
                 }
@@ -676,10 +679,7 @@ NSDecimalNumber *time_token = 0;
             }
             
             if (success) {
-                
-                if ([_delegate respondsToSelector:@selector(pubnub:didSucceedPublishingMessageToChannel:withResponce:message:)]) {
-                    [_delegate pubnub:self didSucceedPublishingMessageToChannel:connection.channel withResponce:response message:connection.message];
-                }
+                [self didSucceedPublishingMessageToChannel:connection.channel withResponse:response message:connection.message];
             } else {
                 if (error) {
                     array= [NSArray arrayWithObjects:@"0", error,  nil];
@@ -710,9 +710,7 @@ NSDecimalNumber *time_token = 0;
                             
                             if(it.first && it.connected) {
                                 it.connected=NO;
-                                if ([_delegate respondsToSelector:@selector(pubnub:DisconnectToChannel:)]) {
-                                    [_delegate pubnub:self DisconnectToChannel:connection.channel];
-                                }
+                                [self disconnectFromChannel:connection.channel];
                             }
                         }
                     }
@@ -723,9 +721,7 @@ NSDecimalNumber *time_token = 0;
                     }else
                     {
                         _tryCount=0;
-                        if ([_delegate respondsToSelector:@selector(pubnub:Re_ConnectToChannel:)]) {
-                            [_delegate pubnub:self Re_ConnectToChannel:connection.channel];
-                        }
+                        [self reconnectToChannel:connection.channel];
                     }
                 }
                 else {
@@ -735,18 +731,14 @@ NSDecimalNumber *time_token = 0;
                                 // Connect Callback
                             if (it.first == NO) {
                                 it.first = YES;
-                                if ([_delegate respondsToSelector:@selector(pubnub:ConnectToChannel:)]) {
-                                        // NSLog(@"_Connected to channel %@",connection.channel);
-                                    [_delegate pubnub:self ConnectToChannel:connection.channel];
-                                }
+
+                                [self connectToChannel:connection.channel];
                                 break;
                             }else
                             {
                                 if (it.connected == NO ) {
                                     it.connected =YES;
-                                    if ([_delegate respondsToSelector:@selector(pubnub:Re_ConnectToChannel:)]) {
-                                        [_delegate pubnub:self Re_ConnectToChannel:connection.channel];
-                                    }
+                                    [self reconnectToChannel:connection.channel];
                                 }
                             }
                         }
@@ -886,7 +878,6 @@ NSDecimalNumber *time_token = 0;
                 NSArray* array= [NSArray arrayWithObjects:@"0", @"Fetch History request failed due to missing Internet connection",  nil];
                 if ([_delegate respondsToSelector: @selector(pubnub:didFailFetchHistoryOnChannel:withError:)]) {
                     [_delegate pubnub:self didFailFetchHistoryOnChannel:connection.channel withError:array];
-                    
                 }
             }
             break;
@@ -906,10 +897,7 @@ NSDecimalNumber *time_token = 0;
         }
         case kCommand_Here_Now: {
             if ([response isKindOfClass:[NSDictionary class]] ) {
-                if ([_delegate respondsToSelector:@selector(pubnub:here_now:onChannel:)]) {
-                    
-                    [_delegate pubnub:self here_now:response onChannel:connection.channel];
-                }
+                [self hereNow:response onChannel:connection.channel];
             }
             break;
         }
@@ -919,6 +907,84 @@ NSDecimalNumber *time_token = 0;
             break;
     }
     [_connections removeObject: connection];
+}
+
+
+#pragma mark - Deprecated delegate method handlers
+
+// Each of these methods calls both the new method AND deprecated method, if they exist, in that order.
+//
+// Another possible plan, not implemented here, is
+//
+// if (new one exists)
+//     call new one
+// else if (deprecated one exists)
+//     call deprecated one
+
+
+- (void)didSucceedPublishingMessageToChannel:(NSString *)channel
+                                withResponse:(id)response
+                                     message:(id)message
+{
+    if ([_delegate respondsToSelector:@selector(pubnub:didSucceedPublishingMessageToChannel:withResponse:message:)]) {
+        [_delegate pubnub:self didSucceedPublishingMessageToChannel:channel withResponse:response message:message];
+    }
+
+    // TODO: DEPRECATED METHOD
+    if ([_delegate respondsToSelector:@selector(pubnub:didSucceedPublishingMessageToChannel:withResponce:message:)]) {
+        [_delegate pubnub:self didSucceedPublishingMessageToChannel:channel withResponce:response message:message];
+    }
+}
+
+- (void)connectToChannel:(NSString *)channel
+{
+    if ([_delegate respondsToSelector:@selector(pubnub:connectToChannel:)]) {
+        // NSLog(@"_Connected to channel %@",connection.channel);
+        [_delegate pubnub:self connectToChannel:channel];
+    }
+
+    // TODO: DEPRECATED METHOD
+    if ([_delegate respondsToSelector:@selector(pubnub:ConnectToChannel:)]) {
+        // NSLog(@"_Connected to channel %@",connection.channel);
+        [_delegate pubnub:self ConnectToChannel:channel];
+    }
+}
+
+- (void)reconnectToChannel:(NSString *)channel
+{
+
+    if ([_delegate respondsToSelector:@selector(pubnub:reconnectToChannel:)]) {
+        [_delegate pubnub:self reconnectToChannel:channel];
+    }
+
+    // TODO: DEPRECATED METHOD
+    if ([_delegate respondsToSelector:@selector(pubnub:Re_ConnectToChannel:)]) {
+        [_delegate pubnub:self Re_ConnectToChannel:channel];
+    }
+}
+
+- (void)disconnectFromChannel:(NSString *)channel
+{
+    if ([_delegate respondsToSelector:@selector(pubnub:disconnectFromChannel:)]) {
+        [_delegate pubnub:self disconnectFromChannel:channel];
+    }
+
+    // TODO: DEPRECATED METHOD
+    if ([_delegate respondsToSelector:@selector(pubnub:DisconnectToChannel:)]) {
+        [_delegate pubnub:self DisconnectToChannel:channel];
+    }
+}
+
+- (void)hereNow:(NSDictionary *)response onChannel:(NSString *)channel
+{
+    if ([_delegate respondsToSelector:@selector(pubnub:hereNow:onChannel:)]) {
+        [_delegate pubnub:self hereNow:response onChannel:channel];
+    }
+
+    // TODO: DEPRECATED METHOD
+    if ([_delegate respondsToSelector:@selector(pubnub:here_now:onChannel:)]) {
+        [_delegate pubnub:self here_now:response onChannel:channel];
+    }
 }
 
 @end

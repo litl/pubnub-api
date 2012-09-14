@@ -66,9 +66,10 @@
 - (void)subscribe:(NSString *)channel;  // Does nothing if already subscribed
 - (void)unsubscribeFromChannel:(NSString *)channel;  // Does nothing if not subscribed
 - (BOOL)isSubscribedToChannel:(NSString *)channel;
-- (void)here_now:(NSString *)channel;
+- (void)hereNow:(NSString *)channel;
 - (void)presence:(NSString *)channel;
 
+- (void)here_now:(NSString *)channel __deprecated;
 
 @end
 

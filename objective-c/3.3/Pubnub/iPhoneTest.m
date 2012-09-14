@@ -94,7 +94,7 @@ CEPubnub *pubnub;
 }
 
 - (IBAction)Here_Now:(id)sender {
-     [pubnub here_now: @"hello_world"];
+     [pubnub hereNow: @"hello_world"];
 }
 
 - (IBAction)Presence:(id)sender {
@@ -165,10 +165,10 @@ CEPubnub *_pubnubtemp;
 
 - (void)pubnub:(CEPubnub *)pubnub
     didSucceedPublishingMessageToChannel:(NSString *)channel
-    withResponce:(id)responce
+    withResponse:(id)response
     message:(id)message
 {
-    NSLog(@"Sent message to PubNub channel \"%@\"  \n%@ \nSent Message:%@", channel, responce,  message);
+    NSLog(@"Sent message to PubNub channel \"%@\"  \n%@ \nSent Message:%@", channel, response,  message);
 }
 
 // "error" may be nil
@@ -249,15 +249,15 @@ CEPubnub *_pubnubtemp;
     [txt setText:[NSString stringWithFormat:@"Time  :- received:\n %f", time]];
 }
 
-- (void)pubnub:(CEPubnub *)pubnub ConnectToChannel:(NSString *)channel{
+- (void)pubnub:(CEPubnub *)pubnub connectToChannel:(NSString *)channel{
     NSLog(@"Connect to Channel:   %@",channel);
 }
 
-- (void)pubnub:(CEPubnub *)pubnub DisconnectToChannel:(NSString *)channel{
+- (void)pubnub:(CEPubnub *)pubnub disconnectFromChannel:(NSString *)channel{
     NSLog(@"Disconnect to Channel:   %@",channel);
 }
 
-- (void)pubnub:(CEPubnub *)pubnub Re_ConnectToChannel:(NSString *)channel{
+- (void)pubnub:(CEPubnub *)pubnub reconnectToChannel:(NSString *)channel{
     NSLog(@"Re-Connect to Channel:   %@",channel);
 }
 
@@ -272,7 +272,7 @@ CEPubnub *_pubnubtemp;
     [txt setText:[NSString stringWithFormat:@"Presence received on channel %@:-\n %@",channel, message]];
 }
 
-- (void)pubnub:(CEPubnub *)pubnub here_now:(NSDictionary *)message onChannel:(NSString *)channel
+- (void)pubnub:(CEPubnub *)pubnub hereNow:(NSDictionary *)message onChannel:(NSString *)channel
 {
     [txt setText:[NSString stringWithFormat:@"sub on channel (dict) : %@ - received:\n %@", channel, message]];
     NSLog(@"here_now-   %@",message);
@@ -312,7 +312,7 @@ CEPubnub *_pubnubtemp;
 
 - (void)pubnub:(CEPubnub *)pubnub
     didSucceedPublishingMessageToChannel:(NSString *)channel
-    withResponce:(id)responce
+    withResponse:(id)response
     message:(id)message
 {
     [self test:YES message:[NSString stringWithFormat:@"Publish of channel:%@",channel]];
@@ -356,7 +356,7 @@ CEPubnub *_pubnubtemp;
     NSLog(@"didReceiveTime   %f",time );
 }  
 
-- (void)pubnub:(CEPubnub *)pubnub ConnectToChannel:(NSString *)channel
+- (void)pubnub:(CEPubnub *)pubnub connectToChannel:(NSString *)channel
 {
     NSLog(@"Connect to Channel:   %@",channel);
     NSNumber *connections = (NSNumber*) [status objectForKey:@"connections"];
@@ -365,12 +365,12 @@ CEPubnub *_pubnubtemp;
     [_pubnubtemp publish:[NSDictionary dictionaryWithObjectsAndKeys:channel,@"channel",[NSDictionary dictionaryWithObjectsAndKeys:@"X-code->ÇÈ°∂@#$%^&*()!",@"Editer",@"Objective-c",@"Language", nil],@"message", nil]];
 }  
 
-- (void)pubnub:(CEPubnub *)pubnub DisconnectToChannel:(NSString *)channel
+- (void)pubnub:(CEPubnub *)pubnub disconnectFromChannel:(NSString *)channel
 {
     NSLog(@"Disconnect to Channel:   %@",channel);
 } 
 
-- (void)pubnub:(CEPubnub *)pubnub Re_ConnectToChannel:(NSString *)channel
+- (void)pubnub:(CEPubnub *)pubnub reconnectToChannel:(NSString *)channel
 {
     NSLog(@"Re-Connect to Channel:   %@",channel);
 }
