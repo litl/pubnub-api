@@ -772,12 +772,12 @@ NSDecimalNumber* time_token = 0;
                                 [_delegate pubnub:self subscriptionDidReceiveArray:arr onChannel:connection.channel];
                             }
                         }else if ([message isKindOfClass:[NSString class]]) {
-                            if ([_delegate respondsToSelector:@selector(pubnub:subscriptionDidReceiveArray:onChannel:)]) {
+                            if ([_delegate respondsToSelector:@selector(pubnub:subscriptionDidReceiveString:onChannel:)]) {
                                 NSString * str=[self getDecryptedString:(NSString *)message];
                                 [_delegate pubnub:self subscriptionDidReceiveString:str onChannel:connection.channel];
                             }
                         }else {
-                            if ([_delegate respondsToSelector:@selector(pubnub:subscriptionDidFailWithResponse:onChannel:onChannel:)]) {
+                            if ([_delegate respondsToSelector:@selector(pubnub:subscriptionDidFailWithResponse:onChannel:)]) {
                                 [_delegate pubnub:self subscriptionDidFailWithResponse:message onChannel:connection.channel];
                             }
                         }
