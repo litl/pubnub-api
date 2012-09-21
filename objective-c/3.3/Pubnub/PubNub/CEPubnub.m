@@ -116,7 +116,13 @@ typedef enum {
         NSString *contentType = [[_response allHeaderFields] objectForKey:@"Content-Type"];
         if ([contentType hasPrefix:@"text/javascript"] && [contentType containsString:@"UTF-8"]) {  // Should be [text/javascript; charset="UTF-8"] but is sometimes different on 3G
             NSError* error = nil;
-            id result = [NSJSONSerialization JSONObjectWithData:_data options:kNilOptions error:&error];
+            id result = nil;
+            if (![NSJSONSerialization class]) {
+                //iOS < 5 didn't have the JSON serialization class
+                result = [_data objectFromJSONData]; //JSONKit
+            } else {
+                result = [NSJSONSerialization JSONObjectWithData:_data options:kNilOptions error:&error];
+            }
             if (error != nil) result = nil;
             [_pubNub connection:self didCompleteWithResponse:result];
                 //  NSLog(@"PubNub request returned unexpected content type: %@", contentType);
