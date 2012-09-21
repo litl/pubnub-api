@@ -578,9 +578,9 @@ NSDecimalNumber *time_token = 0;
     NSString *url = [NSString stringWithFormat:@"%@/time/0", _host]; 
     NSURLRequest * urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:1.0];
     
-    [NSURLConnection
-     sendAsynchronousRequest:urlRequest
-     queue:[[NSOperationQueue alloc] init] 
+    [self
+     pubnub_sendAsynchronousRequest:urlRequest
+     queue:[[NSOperationQueue alloc] init]
      completionHandler:^(NSURLResponse *response2,
                          NSData *data,
                          NSError *error) 
@@ -1012,4 +1012,35 @@ NSDecimalNumber *time_token = 0;
     }
 }
 
+
+#pragma mark NSURLConnection sendAsynchronousRequest category
+
+-(void)pubnub_sendAsynchronousRequest:(NSURLRequest*)request
+                                queue:(NSOperationQueue*)queue
+                    completionHandler:(void(^)(NSURLResponse *response, NSData *data, NSError *error))handler
+{
+    __block NSURLResponse *response = nil;
+    __block NSError *error = nil;
+    __block NSData *data = nil;
+    
+    // Wrap up synchronous request within a block operation
+    NSBlockOperation *blockOperation = [NSBlockOperation blockOperationWithBlock:^{
+        data = [NSURLConnection sendSynchronousRequest:request
+                                     returningResponse:&response
+                                                 error:&error];
+    }];
+    
+    // Set completion block
+    // EDIT: Set completion block, perform on main thread for safety
+    blockOperation.completionBlock = ^{
+        
+        // Perform completion on main queue
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            handler(response, data, error);
+        }];
+    };
+    
+    // Execute operation
+    [queue addOperation:blockOperation];
+}
 @end
